@@ -53,7 +53,7 @@ void Stage::Initialize()
 
     trLightBall.position_ = { 0, 0, 0 };
     trLightBall.rotate_ = { 0, 0, 0 };
-    trLightBall.scale_ = { 0.05, 0.05, 0.05};
+    trLightBall.scale_ = { 0.5, 0.5, 0.5};
     Instantiate<axisClass>(this);
     IntConstantBuffer();
 }
