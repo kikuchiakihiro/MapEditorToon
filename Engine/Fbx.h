@@ -40,10 +40,10 @@ class Fbx
 		XMMATRIX	matW;//wvp
 		XMMATRIX	matNormal;//ƒ[ƒ‹ƒh•ÏŠ·‚¾‚¯‚Ì‚â‚Â
 		XMFLOAT4	diffuseColor;
+		BOOL		isTextured;
 		XMFLOAT4	ambientColor;
 		XMFLOAT4	specularColor;
 		FLOAT		shininess;
-		BOOL		isTextured;
 	};
 
 	struct VERTEX

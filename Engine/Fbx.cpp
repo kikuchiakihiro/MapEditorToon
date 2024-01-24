@@ -314,66 +314,66 @@ void Fbx::Draw(Transform& transform)
 			//描画
 			Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0);
 		}
-		Direct3D::SetShader(SHADER_TOON);
-		transform.Calclation();//トランスフォームを計算
-		for (int j = 0; j < 2; j++) {
+	Direct3D::SetShader(SHADER_TOON);
+	transform.Calclation();//トランスフォームを計算
+	for (int j = 0; j < 2; j++) {
 
-			for (int i = 0; i < materialCount_; i++)
+		for (int i = 0; i < materialCount_; i++)
+		{
+			//コンスタントバッファに情報を渡す
+			CBUFF_MODEL cb;
+			cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
+			cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
+			cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
+
+
+			cb.diffuseColor = pMaterialList_[i].diffuse;
+			cb.ambientColor = pMaterialList_[i].ambient;
+			cb.specularColor = pMaterialList_[i].specular;
+			cb.shininess = pMaterialList_[i].shininess;
+
+			cb.isTextured = pMaterialList_[i].pTexture != nullptr;
+
+			Direct3D::pContext_->UpdateSubresource(pConstantBuffer_, 0, NULL, &cb, 0, 0);
+
+			//頂点バッファ、インデックスバッファ、コンスタントバッファをパイプラインにセット
+			//頂点バッファ
+			UINT stride = sizeof(VERTEX);
+			UINT offset = 0;
+			Direct3D::pContext_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
+
+
+			// インデックスバッファーをセット
+			stride = sizeof(int);
+			offset = 0;
+			Direct3D::pContext_->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
+
+			//コンスタントバッファ
+			Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_);	//頂点シェーダー用	
+			Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_);	//ピクセルシェーダー用
+
+
+			if (pMaterialList_[i].pTexture)
 			{
-				//コンスタントバッファに情報を渡す
-				CBUFF_MODEL cb;
-				cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
-				cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
-				cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
+				ID3D11SamplerState* pSampler = pMaterialList_[i].pTexture->GetSampler();
+				Direct3D::pContext_->PSSetSamplers(0, 1, &pSampler);
 
-
-				cb.diffuseColor = pMaterialList_[i].diffuse;
-				cb.ambientColor = pMaterialList_[i].ambient;
-				cb.specularColor = pMaterialList_[i].specular;
-				cb.shininess = pMaterialList_[i].shininess;
-
-				cb.isTextured = pMaterialList_[i].pTexture != nullptr;
-
-				Direct3D::pContext_->UpdateSubresource(pConstantBuffer_, 0, NULL, &cb, 0, 0);
-
-				//頂点バッファ、インデックスバッファ、コンスタントバッファをパイプラインにセット
-				//頂点バッファ
-				UINT stride = sizeof(VERTEX);
-				UINT offset = 0;
-				Direct3D::pContext_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
-
-
-				// インデックスバッファーをセット
-				stride = sizeof(int);
-				offset = 0;
-				Direct3D::pContext_->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
-
-				//コンスタントバッファ
-				Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_);	//頂点シェーダー用	
-				Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_);	//ピクセルシェーダー用
-
-
-				if (pMaterialList_[i].pTexture)
-				{
-					ID3D11SamplerState* pSampler = pMaterialList_[i].pTexture->GetSampler();
-					Direct3D::pContext_->PSSetSamplers(0, 1, &pSampler);
-
-					ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
-					Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
-				}
-
-
-
-				ID3D11ShaderResourceView* pSRVToon = pToonTex_->GetSRV();
-				Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRVToon);
-
-
-				//描画
-				Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0);
+				ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
+				Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
 			}
 
+
+
+			ID3D11ShaderResourceView* pSRVToon = pToonTex_->GetSRV();
+			Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRVToon);
+
+
+			//描画
+			Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0);
 		}
+
 	}
+}
 	
 }
 

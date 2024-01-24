@@ -21,7 +21,7 @@ void Ball::Initialize()
     hModel_ = Model::Load("Assets/donut.fbx");
     assert(hModel_ >= 0);
     //transform_.position_.y = 1;
-    transform_.scale_ = { 1.5,1.5,1.5 };
+    transform_.scale_ = { 0.25,0.25,0.25 };
 }
 
 //çXêV

@@ -18,7 +18,7 @@ cbuffer global:register(b0)
     float4x4    matWVP;         // ワールド・ビュー・プロジェクションの合成行列
     float4x4    matNormal;      //法線
     float4      diffuseColor;   // ディフューズカラー（マテリアルの色）
-    bool        isTexture;      // テクスチャ貼ってあるかどうか
+    bool        isTextured;      // テクスチャ貼ってあるかどうか
 };
 
 //cBuffer from stage.cpp
@@ -89,6 +89,6 @@ float4 PS(VS_OUT inData) : SV_Target
           return float4(1, 1, 1, 1);
       //return g_toontexture.Sample(g_sampler, inData.color);
   else
-      return float4(1,1,1,1);
+      return float4(0,0,0,0);
 
 }
